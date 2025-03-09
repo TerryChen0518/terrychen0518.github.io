@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>命中率計算器</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>命中率計算器</h1>
+    <form @submit.prevent="calculateHitRate">
+      <label>等級：</label>
+      <input type="number" v-model.number="level" required><br>
+
+      <label>職業：</label>
+      <select v-model="profession" required>
+        <option value="knight">騎士</option>
+        <option value="darkElf">黑妖</option>
+        <option value="elf">妖精</option>
+        <option value="prince">王族</option>
+        <option value="mage">法師</option>
+        <option value="dragonKnight">龍騎士</option>
+      </select><br>
+
+      <label>力量 (STR)：</label>
+      <input type="number" v-model.number="strength" required><br>
+
+      <label>敏捷 (DEX)：</label>
+      <input type="number" v-model.number="dexterity" required><br>
+
+      <label>負重 (%)：</label>
+      <input type="number" v-model.number="weight" required><br>
+
+      <label>攻擊成功：</label>
+      <input type="number" v-model.number="attackSuccess" required><br>
+
+      <label>武器強化值：</label>
+      <input type="number" v-model.number="weaponEnhancement" required><br>
+
+      <button type="submit">計算命中值</button>
+    </form>
+
+    <h2 v-if="hitRate !== null">計算出的命中值：{{ hitRate }}</h2>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        level: 1,
+        profession: 'knight',
+        strength: 10,
+        dexterity: 10,
+        weight: 0,
+        attackSuccess: 0,
+        weaponEnhancement: 0,
+        hitRate: null
+      },
+      methods: {
+        calculateHitRate() {
+          const professionBonus = this.getProfessionBonus();
+          const strengthBonus = this.getStrengthBonus();
+          const dexterityBonus = this.getDexterityBonus();
+          const weightPenalty = this.getWeightPenalty();
+          const weaponBonus = Math.floor(this.weaponEnhancement / 2);
+
+          this.hitRate =
+            this.level +
+            professionBonus +
+            strengthBonus +
+            dexterityBonus +
+            weightPenalty +
+            this.attackSuccess +
+            weaponBonus;
+        },
+        getProfessionBonus() {
+          if (this.profession === 'knight' || this.profession === 'darkElf') {
+            return Math.floor(this.level / 3);
+          } else if (this.profession === 'elf' || this.profession === 'prince') {
+            return Math.floor(this.level / 5);
+          } else if (this.profession === 'dragonKnight') {
+            return Math.floor(this.level / 4); // 龍騎士每 4 級增加 1 點
+          } else {
+            return 0;
+          }
+        },
+        getStrengthBonus() {
+          const strengthTable = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+          let index = Math.max(0, Math.min(this.strength - 8, strengthTable.length - 1));
+          return strengthTable[index] || 0;
+        },
+        getDexterityBonus() {
+          const dexterityTable = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+          let index = Math.max(0, Math.min(this.dexterity - 7, dexterityTable.length - 1));
+          return dexterityTable[index] || 0;
+        },
+        getWeightPenalty() {
+          if (this.weight < 50) return 0;
+          if (this.weight < 60) return -1;
+          if (this.weight < 70) return -2;
+          if (this.weight < 80) return -3;
+          if (this.weight < 90) return -4;
+          return -5;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
