@@ -95,12 +95,12 @@
           return dexterityTable[index] || 0;
         },
         getWeightPenalty() {
-          if (this.weight < 50) return 0;
-          if (this.weight < 60) return -1;
-          if (this.weight < 70) return -2;
-          if (this.weight < 80) return -3;
-          if (this.weight < 90) return -4;
-          return -5;
+          const weight = this.weight;
+          if (weight >= 0 && weight <= 31) return 0;
+          if (weight >= 34 && weight <= 48) return -1;
+          if (weight >= 51 && weight <= 65) return -3;
+          if (weight >= 68 && weight <= 82) return -5;
+          return 0; // 其他未定義範圍，不做懲罰
         }
       }
     });
